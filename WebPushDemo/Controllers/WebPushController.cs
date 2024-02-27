@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using WebPush;
 using WebPushDemo.Data;
 
@@ -22,7 +24,7 @@ namespace WebPushDemo.Controllers
             var vapidPublicKey = configuration.GetSection("VapidKeys")["PublicKey"];
             var vapidPrivateKey = configuration.GetSection("VapidKeys")["PrivateKey"];
 
-            var pushSubscription = new PushSubscription(device?.PushEndpoint, device?.PushP256Dh, device?.PushAuth);
+            var pushSubscription = new PushSubscription(device?.PushEndpoint, device?.PushP256DH, device?.PushAuth);
             var vapidDetails = new VapidDetails("mailto:example@example.com", vapidPublicKey, vapidPrivateKey);
 
             var webPushClient = new WebPushClient();

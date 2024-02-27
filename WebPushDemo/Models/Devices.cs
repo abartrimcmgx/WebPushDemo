@@ -15,7 +15,7 @@ namespace WebPushDemo.Models
         [MaxLength(512)]
         public string PushEndpoint { get; set; } = default!;
         [MaxLength(512)]
-        public string PushP256Dh { get; set; } = default!;
+        public string PushP256DH { get; set; } = default!;
         [MaxLength(512)]
         public string PushAuth { get; set; } = default!;
     }

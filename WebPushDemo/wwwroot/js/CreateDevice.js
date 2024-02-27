@@ -1,4 +1,5 @@
-﻿const serviceWorker = '/sw.js';
+﻿// let applicationServerPublicKey = 'BN7WF0QL_h8mLTsexWsrgtIFqijHe4uC7ra13QNVfXop1_o3wmbNF2gJc-AnScj69tvpndqJOxwbkaMli-Gx3jo';
+const serviceWorker = '/sw.js';
 let isSubscribed = false;
 
 function requestNotificationPermission() {
