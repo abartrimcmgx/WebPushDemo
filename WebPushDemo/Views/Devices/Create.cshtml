@@ -1,4 +1,5 @@
 ﻿@model WebPushDemo.Models.Devices
+
 @section Scripts
 {
     <script src="@Url.Content("~/js/CreateDevice.js")"></script>
@@ -9,7 +10,7 @@
 }
 
 <h2>Add Device</h2>
-<hr />
+<hr/>
 <div class="row">
     <div class="alert alert-info">
         <strong>Developer Notes:</strong>
@@ -17,7 +18,12 @@
             <li>You can find the logic for registering a device in wwwroot/js/CreateDevice.js</li>
             <li>ServiceWorkers on chrome will only work on sites with ssl enabled or local webservers.</li>
             <li>Microsoft Edge requires enabling service workers.</li>
+            <li>Recent changes to the Push API require permission request to be based on a user action.</li>
         </ul>
+    </div>
+    @* <-- Add a button to trigger asking for permission to send notifications --> *@
+    <div class="form-group">
+        <button id="subscribeButton" class="btn btn-primary" onclick="requestNotificationPermission()">Subscribe</button>
     </div>
     <div class="alert alert-danger" style="display: none;">
         <strong>Error:</strong>
@@ -29,7 +35,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group" style="width:500px">
                 <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" required />
+                <input asp-for="Name" class="form-control" required/>
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="well" style="width: 500px;">
@@ -42,9 +48,9 @@
                     <span asp-validation-for="PushEndpoint" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="PushP256DH" class="control-label"></label>
-                    <input asp-for="PushP256DH" class="form-control" readonly required/>
-                    <span asp-validation-for="PushP256DH" class="text-danger"></span>
+                    <label asp-for="PushP256Dh" class="control-label"></label>
+                    <input asp-for="PushP256Dh" class="form-control" readonly required/>
+                    <span asp-validation-for="PushP256Dh" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="PushAuth" class="control-label"></label>
@@ -53,7 +59,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Save" class="btn btn-primary"/>
             </div>
         </form>
     </div>
@@ -64,6 +70,6 @@
 </div>
 
 <script>
-    //Vapid public key.
-    var applicationServerPublicKey = '@ViewBag.PublicKey';
+    // Vapid public key.
+    let applicationServerPublicKey = '@ViewBag.PublicKey';
 </script>

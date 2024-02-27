@@ -1,12 +1,15 @@
-﻿//var applicationServerPublicKey = '';
-var serviceWorker = '/sw.js';
-var isSubscribed = false;
+﻿const serviceWorker = '/sw.js';
+let isSubscribed = false;
 
-$(document).ready(function () {
+function requestNotificationPermission() {
     // Application Server Public Key defined in Views/Device/Create.cshtml
-    if (typeof applicationServerPublicKey === 'undefined') {
+    if (typeof applicationServerPublicKey === 'undefined' || applicationServerPublicKey === '') {
         errorHandler('Vapid public key is undefined.');
         return;
+    }
+
+    if (!("Notification" in window)) {
+        errorHandler("This browser does not support desktop notification");
     }
 
     Notification.requestPermission().then(function (status) {
@@ -15,11 +18,13 @@ $(document).ready(function () {
         } else if (status === 'granted') {
             console.log('[Notification.requestPermission] Initializing service worker.');
             initialiseServiceWorker();
+        } else {
+            errorHandler('[Notification.requestPermission] Browser dismissed permissions to notification api.');
         }
     });
 
     subscribe();
-});
+}
 
 function initialiseServiceWorker() {
     if ('serviceWorker' in navigator) {
@@ -75,18 +80,18 @@ function initialiseState(reg) {
 
 function subscribe() {
     navigator.serviceWorker.ready.then(function (reg) {
-        var subscribeParams = { userVisibleOnly: true };
+        let subscribeParams = {userVisibleOnly: true};
 
         //Setting the public key of our VAPID key pair.
-        var applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
+        let applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
         subscribeParams.applicationServerKey = applicationServerKey;
 
         reg.pushManager.subscribe(subscribeParams)
             .then(function (subscription) {
                 isSubscribed = true;
 
-                var p256dh = base64Encode(subscription.getKey('p256dh'));
-                var auth = base64Encode(subscription.getKey('auth'));
+                let p256dh = base64Encode(subscription.getKey('p256dh'));
+                let auth = base64Encode(subscription.getKey('auth'));
 
                 console.log(subscription);
 

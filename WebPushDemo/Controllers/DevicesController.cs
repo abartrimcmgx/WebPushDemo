@@ -1,85 +1,65 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using WebPush;
+using WebPushDemo.Data;
 using WebPushDemo.Models;
 
-namespace WebPushDemo.Controllers
+namespace WebPushDemo.Controllers;
+
+public class DevicesController(WebPushDemoContext context, IConfiguration configuration) : Controller
 {
-    public class DevicesController : Controller
+    // GET: Devices
+    public async Task<IActionResult> Index()
     {
-        private readonly WebPushDemoContext _context;
+        return View(await context.Devices.ToListAsync());
+    }
 
-        private readonly IConfiguration _configuration;
+    // GET: Devices/Create
+    public IActionResult Create()
+    {
+        ViewBag.PublicKey = configuration.GetSection("VapidKeys")["PublicKey"] ?? string.Empty;
 
-        public DevicesController(WebPushDemoContext context, IConfiguration configuration)
+        return View();
+    }
+
+    // POST: Devices/Create
+    // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+    // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create([Bind("Id,Name,PushEndpoint,PushP256DH,PushAuth")] Devices devices)
+    {
+        if (!ModelState.IsValid) return View(devices);
+        context.Add(devices);
+        await context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
+    }
+
+    // GET: Devices/Delete/5
+    public async Task<IActionResult> Delete(int? id)
+    {
+        if (id == null)
         {
-            _context = context;
-            _configuration = configuration;
+            return NotFound();
         }
 
-        // GET: Devices
-        public async Task<IActionResult> Index()
+        var devices = await context.Devices
+            .SingleOrDefaultAsync(m => m.Id == id);
+        if (devices == null)
         {
-            return View(await _context.Devices.ToListAsync());
+            return NotFound();
         }
 
-        // GET: Devices/Create
-        public IActionResult Create()
-        {
-            ViewBag.PublicKey = _configuration.GetSection("VapidKeys")["PublicKey"];
+        return View(devices);
+    }
 
-            return View();
-        }
-
-        // POST: Devices/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,PushEndpoint,PushP256DH,PushAuth")] Devices devices)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(devices);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-
-            return View(devices);
-        }
-       
-        // GET: Devices/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var devices = await _context.Devices
-                .SingleOrDefaultAsync(m => m.Id == id);
-            if (devices == null)
-            {
-                return NotFound();
-            }
-
-            return View(devices);
-        }
-
-        // POST: Devices/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var devices = await _context.Devices.SingleOrDefaultAsync(m => m.Id == id);
-            _context.Devices.Remove(devices);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+    // POST: Devices/Delete/5
+    [HttpPost, ActionName("Delete")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> DeleteConfirmed(int id)
+    {
+        var devices = await context.Devices.SingleOrDefaultAsync(m => m.Id == id);
+        if (devices != null) context.Devices.Remove(devices);
+        await context.SaveChangesAsync();
+        return RedirectToAction(nameof(Index));
     }
 }
